@@ -6,9 +6,9 @@ on:
       secrets:
         SSH_PRIVATE_KEY:
           required: true
-        deploy_port
+        deploy_port:
           required: true
-        deploy_host
+        deploy_host:
           required: true
 
 jobs:
