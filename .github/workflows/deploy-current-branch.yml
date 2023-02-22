@@ -19,6 +19,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Configure ssh
+        run: |
+          eval $(ssh-agent -s)
+          echo "SSH_AUTH_SOCK=$(echo $SSH_AUTH_SOCK)" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$(echo $SSH_AGENT_PID)" >> $GITHUB_ENV
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+
       - name: Scan deploy host key
         run: |
           install -m 700 --directory ~/.ssh
@@ -30,6 +37,6 @@ jobs:
           port="${{ secrets.deploy_port }}"
           user="${{ secrets.deploy_user }}"
           host="${{ secrets.deploy_host }}"
-          path="${{ secrets.deploy_path }}"
+          path="${{ inputs.deploy_path }}"
           ssh -o ForwardAgent=yes -p"$port" "$user@$host" -- "cd $path && git pull"
 

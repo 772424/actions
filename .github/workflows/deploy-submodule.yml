@@ -1,4 +1,4 @@
-name: Deploy tagged release
+name: Deploy submodule
 
 on:
   workflow_call:
@@ -8,7 +8,7 @@ on:
         type: string
 
     secrets:
-      SSH_PRIVATE_KEY:
+      SSH_PRIVATE_KEY_SUB:
         required: true
       deploy_port:
         required: true
@@ -24,7 +24,7 @@ jobs:
           eval $(ssh-agent -s)
           echo "SSH_AUTH_SOCK=$(echo $SSH_AUTH_SOCK)" >> $GITHUB_ENV
           echo "SSH_AGENT_PID=$(echo $SSH_AGENT_PID)" >> $GITHUB_ENV
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+          echo "${{ secrets.SSH_PRIVATE_KEY_SUB }}" | tr -d '\r' | ssh-add -
 
       - name: Scan deploy host key
         run: |
@@ -38,5 +38,4 @@ jobs:
           user="${{ secrets.deploy_user }}"
           host="${{ secrets.deploy_host }}"
           path="${{ inputs.deploy_path }}"
-          ssh -o ForwardAgent=yes -p"$port" "$user@$host" -- "cd $path && git fetch --tags && git checkout ${{ github.ref_name }}"
-
+          ssh -o ForwardAgent=yes -p"$port" "$user@$host" -- "cd $path && git submodule update --init"
