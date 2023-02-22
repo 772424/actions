@@ -2,14 +2,13 @@ name: Configure ssh
 
 on:
   workflow_call:
-    inputs:
-      secrets:
-        SSH_PRIVATE_KEY:
-          required: true
-        deploy_port:
-          required: true
-        deploy_host:
-          required: true
+    secrets:
+      SSH_PRIVATE_KEY:
+        required: true
+      deploy_port:
+        required: true
+      deploy_host:
+        required: true
 
 jobs:
   configure:
