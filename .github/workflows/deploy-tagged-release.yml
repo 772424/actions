@@ -16,6 +16,7 @@ on:
         required: true
 
 jobs:
+  runs-on: ubuntu-latest
   deploy:
     steps:
       - name: Deploy tagged release using ssh
