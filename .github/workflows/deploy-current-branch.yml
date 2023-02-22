@@ -37,7 +37,7 @@ jobs:
           host_ip=$(host "${{ secrets.deploy_host }}" | awk '{print $NF}')
           ssh-keyscan -p"${{ secrets.deploy_port }}" -H "${{ secrets.deploy_host }}" "$host_ip" >> ~/.ssh/known_hosts
 
-      - name: Deploy site using ssh
+      - name: Deploy site using ssh to ${{ inputs.environment }}
         run: |
           port="${{ secrets.deploy_port }}"
           user="${{ secrets.deploy_user }}"
