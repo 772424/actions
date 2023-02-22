@@ -1,0 +1,26 @@
+name: Deploy tagged release
+
+on:
+  workflow_call:
+    inputs:
+      secrets:
+        SSH_PRIVATE_KEY:
+          required: true
+        deploy_port:
+          required: true
+        deploy_host:
+          required: true
+        deploy_path:
+          required: true
+
+jobs:
+  deploy:
+    steps:
+      - name: Deploy tagged release using ssh
+        run: |
+          port="${{ secrets.deploy_port }}"
+          user="${{ secrets.deploy_user }}"
+          host="${{ secrets.deploy_host }}"
+          path="${{ secrets.deploy_path }}"
+          ssh -o ForwardAgent=yes -p"$port" "$user@$host" -- "cd $path && git fetch --tags && git checkout ${{ github.ref_name }}"
+
