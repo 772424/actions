@@ -20,6 +20,3 @@ jobs:
           echo "SSH_AUTH_SOCK=$(echo $SSH_AUTH_SOCK)" >> $GITHUB_ENV
           echo "SSH_AGENT_PID=$(echo $SSH_AGENT_PID)" >> $GITHUB_ENV
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
-          install -m 700 --directory ~/.ssh
-          host_ip=$(host "${{ secrets.deploy_host }}" | awk '{print $NF}')
-          ssh-keyscan -p"${{ secrets.deploy_port }}" -H "${{ secrets.deploy_host }}" "$host_ip" >> ~/.ssh/known_hosts

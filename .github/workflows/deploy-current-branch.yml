@@ -19,6 +19,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Scan deploy host key
+        run: |
+          install -m 700 --directory ~/.ssh
+          host_ip=$(host "${{ secrets.deploy_host }}" | awk '{print $NF}')
+          ssh-keyscan -p"${{ secrets.deploy_port }}" -H "${{ secrets.deploy_host }}" "$host_ip" >> ~/.ssh/known_hosts
+
       - name: Deploy site using ssh
         run: |
           port="${{ secrets.deploy_port }}"
