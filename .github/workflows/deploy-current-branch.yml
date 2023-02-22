@@ -16,8 +16,8 @@ on:
         required: true
 
 jobs:
-  runs-on: ubuntu-latest
   deploy:
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy site using ssh
         run: |

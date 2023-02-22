@@ -11,8 +11,8 @@ on:
         required: true
 
 jobs:
-  runs-on: ubuntu-latest
   configure:
+    runs-on: ubuntu-latest
     steps:
       - name: Configure ssh
         run: |
