@@ -35,7 +35,7 @@ jobs:
         run: |
           install -m 700 --directory ~/.ssh
           host_ip=$(host "${{ secrets.deploy_host }}" | awk '{print $NF}')
-          ssh-keyscan -p"${{ secrets.deploy_port }}" -H "${{ secrets.deploy_host }}" "$host_ip" >> ~/.ssh/known_hosts
+          ssh-keyscan -p"${{ secrets.deploy_port }}" -H "${{ secrets.deploy_host }}" "$host_ip" >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Deploy site using ssh to ${{ inputs.environment }}
         run: |
