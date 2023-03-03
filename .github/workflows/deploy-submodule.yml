@@ -16,6 +16,8 @@ on:
         required: true
       deploy_port:
         required: true
+      deploy_user:
+        required: true
       deploy_host:
         required: true
 
