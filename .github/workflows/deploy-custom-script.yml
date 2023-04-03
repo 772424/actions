@@ -1,0 +1,49 @@
+name: Deploy current branch
+
+on:
+  workflow_call:
+    inputs:
+      deploy_path:
+        required: true
+        type: string
+
+      environment:
+        required: true
+        type: string
+
+    secrets:
+      SSH_PRIVATE_KEY:
+        required: true
+      deploy_port:
+        required: true
+      deploy_user:
+        required: true
+      deploy_host:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Configure ssh
+        run: |
+          eval $(ssh-agent -s)
+          echo "SSH_AUTH_SOCK=$(echo $SSH_AUTH_SOCK)" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$(echo $SSH_AGENT_PID)" >> $GITHUB_ENV
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+
+      - name: Scan deploy host key
+        run: |
+          install -m 700 --directory ~/.ssh
+          host_ip=$(host "${{ secrets.deploy_host }}" | awk '{print $NF}')
+          ssh-keyscan -p"${{ secrets.deploy_port }}" -H "${{ secrets.deploy_host }}" "$host_ip" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy site using ssh to ${{ inputs.environment }}
+        run: |
+          port="${{ secrets.deploy_port }}"
+          user="${{ secrets.deploy_user }}"
+          host="${{ secrets.deploy_host }}"
+          path="${{ inputs.deploy_path }}"
+          script="${{ inputs.deploy_script }}"
+          ssh -o ForwardAgent=yes -p"$port" "$user@$host" -- "cd $path && test -x $script && bash $script"
