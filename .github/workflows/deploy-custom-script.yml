@@ -11,6 +11,10 @@ on:
         required: true
         type: string
 
+      deploy_script:
+        required: true
+        type: string
+
     secrets:
       SSH_PRIVATE_KEY:
         required: true
