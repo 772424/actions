@@ -50,4 +50,4 @@ jobs:
           host="${{ secrets.deploy_host }}"
           path="${{ inputs.deploy_path }}"
           script="${{ inputs.deploy_script }}"
-          ssh -o ForwardAgent=yes -p"$port" "$user@$host" -- "cd $path && test -x $script && bash $script"
+          ssh -o ForwardAgent=yes -p"$port" "$user@$host" -- "cd $path && test -x $script && $script"
