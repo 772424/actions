@@ -49,13 +49,27 @@ jobs:
           host_ip=$(host "${{ secrets.deploy_host }}" | awk '{print $NF}')
           ssh-keyscan -p"${{ secrets.deploy_port }}" -H "${{ secrets.deploy_host }}" "$host_ip" >> ~/.ssh/known_hosts 2>/dev/null
 
+      - name: configure ssh control master
+        run: |
+          config="Host ${{ secrets.deploy_host }}
+            ControlMaster auto
+            ControlPath ~/.ssh/%C
+            ControlPersist 2m
+            ForwardAgent yes
+            Port ${{ secrets.deploy_port }}
+            User ${{ secrets.deploy_user }}"
+          echo "$config" >> ~/.ssh/config
+
       - name: Deploy site using ssh to ${{ inputs.environment }}
-        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && git pull"
+        run: ssh "${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && git pull"
 
       - name: Use composer install
         if: "${{ github.event.inputs.use_composer && github.event.inputs.php_version == '' }}"
-        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v composer >/dev/null && composer install --no-dev"
+        run: ssh "${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v composer >/dev/null && composer install --no-dev"
 
       - name: Use composer install with a specific php version
         if: "${{ github.event.inputs.use_composer && github.event.inputs.php_version != '' }}"
-        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v php${{ github.event.inputs.php_version }} >/dev/null && composer=$(command -v composer) && php${{ github.event.inputs.php_version }} $composer install --no-dev"
+        run: ssh "${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v php${{ github.event.inputs.php_version }} >/dev/null && composer=$(command -v composer) && php${{ github.event.inputs.php_version }} $composer install --no-dev"
+
+      - name: Close control master socket
+        run: ssh -O check "${{ secrets.deploy_host }}" 2>/dev/null && ssh -O stop "${{ secrets.deploy_host }}"
