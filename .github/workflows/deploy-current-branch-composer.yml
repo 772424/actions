@@ -74,7 +74,7 @@ jobs:
 
       - name: Use composer install with a specific php version
         if: inputs.use_composer == 'true' && inputs.php_version != 'false'
-        run: ssh "${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v php${{ inputs.php_version }} >/dev/null && composer=$(command -v composer) && php${{ inputs.php_version }} $composer install --no-dev"
+        run: ssh "${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v php${{ inputs.php_version }} >/dev/null && composer=\$(command -v composer) && php${{ inputs.php_version }} \$composer install --no-dev"
 
       - name: Close control master socket
         run: ssh -O check "${{ secrets.deploy_host }}" 2>/dev/null && ssh -O stop "${{ secrets.deploy_host }}"
