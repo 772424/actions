@@ -68,11 +68,11 @@ jobs:
         run: ssh "${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && git pull"
 
       - name: Use composer install
-        if: fromJSON(github.event.inputs.use_composer) == true && github.event.inputs.php_version == ''
+        if: github.event.inputs.use_composer == 'true' && github.event.inputs.php_version == ''
         run: ssh "${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v composer >/dev/null && composer install --no-dev"
 
       - name: Use composer install with a specific php version
-        if: fromJSON(github.event.inputs.use_composer) && github.event.inputs.php_version != ''
+        if: github.event.inputs.use_composer == 'true' && github.event.inputs.php_version != ''
         run: ssh "${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v php${{ github.event.inputs.php_version }} >/dev/null && composer=$(command -v composer) && php${{ github.event.inputs.php_version }} $composer install --no-dev"
 
       - name: Close control master socket
