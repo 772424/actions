@@ -9,7 +9,7 @@ on:
 
       environment:
         required: true
-        type: environment
+        type: string
 
       use_composer:
         required: false
