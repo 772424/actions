@@ -61,7 +61,7 @@ jobs:
           echo "$config" >> ~/.ssh/config
 
       - name: Check if the project is already deployed or clone it
-        run: ssh "${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && (test -e .git/config || git clone git@github.com/${{ github.repository }}.git .)"
+        run: ssh "${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && (test -e .git/config || git clone git@github.com:${{ github.repository }}.git .)"
 
       - name: Deploy site using ssh to ${{ inputs.environment }}
         run: ssh "${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && git pull"
