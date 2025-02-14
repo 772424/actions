@@ -6,10 +6,22 @@ on:
       deploy_path:
         required: true
         type: string
+        description: 'path to deploy'
 
       environment:
-        required: true
         type: string
+        required: true
+        description: 'Environment to run tests against'
+
+      use_composer:
+        required: false
+        type: boolean
+        description: Set to true to use composer install after deploy
+
+      php_version:
+        required: false
+        type: string
+        description: use a specific php version, if not define, it will use the defaut php bin
 
     secrets:
       SSH_PRIVATE_KEY:
