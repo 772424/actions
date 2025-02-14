@@ -39,11 +39,13 @@ jobs:
           host_ip=$(host "${{ secrets.deploy_host }}" | awk '{print $NF}')
           ssh-keyscan -p"${{ secrets.deploy_port }}" -H "${{ secrets.deploy_host }}" "$host_ip" >> ~/.ssh/known_hosts
 
-      - name: Deploy tagged release using ssh to ${{ inputs.environment }}
-        run: |
-          port="${{ secrets.deploy_port }}"
-          user="${{ secrets.deploy_user }}"
-          host="${{ secrets.deploy_host }}"
-          path="${{ inputs.deploy_path }}"
-          ssh -o ForwardAgent=yes -p"$port" "$user@$host" -- "cd $path && git fetch --tags && git checkout ${{ github.ref_name }}"
+      - name: Deploy site using ssh to ${{ inputs.environment }}
+        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && git fetch --tags && git checkout ${{ github.ref_name }}"
 
+      - name: Use composer install
+        if: "${{ inputs.use_composer && inputs.php_version == '' }}"
+        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v composer >/dev/null && composer install --no-dev"
+
+      - name: Use composer install with a specific php version
+        if: "${{ inputs.use_composer && inputs.php_version != '' }}"
+        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v php${{ inputs.php_version }} >/dev/null && composer=\$(command -v composer) && php${{ inputs.php_version }} \$composer install --no-dev"
