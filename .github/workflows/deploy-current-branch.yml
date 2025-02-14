@@ -60,4 +60,4 @@ jobs:
 
       - name: Use composer install with a specific php version
         if: "${{ inputs.use_composer && inputs.php_version != '' }}"
-        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v php${{ inputs.inputs.php_version }} >/dev/null && composer=\$(command -v composer) && php${{ inputs.inputs.php_version }} \$composer install --no-dev"
+        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v php${{ inputs.php_version }} >/dev/null && composer=\$(command -v composer) && php${{ inputs.php_version }} \$composer install --no-dev"
