@@ -6,10 +6,12 @@ on:
       deploy_path:
         required: true
         type: string
+        description: 'path to deploy'
 
       environment:
-        required: true
         type: environment
+        required: true
+        description: 'Environment to run tests against'
 
       use_composer:
         required: false
