@@ -9,7 +9,7 @@ on:
 
       environment:
         required: true
-        type: environment
+        type: string
 
     secrets:
       SSH_PRIVATE_KEY:
