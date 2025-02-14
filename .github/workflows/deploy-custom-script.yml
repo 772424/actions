@@ -9,7 +9,7 @@ on:
 
       environment:
         required: true
-        type: string
+        type: environment
 
       deploy_script:
         required: true

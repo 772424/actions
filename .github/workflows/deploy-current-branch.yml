@@ -9,7 +9,17 @@ on:
 
       environment:
         required: true
+        type: environment
+
+      use_composer:
+        required: false
+        type: boolean
+        description: Set to true to use composer install after deploy
+
+      php_version:
+        required: false
         type: string
+        description: use a specific php version, if not define, it will use the defaut php bin
 
     secrets:
       SSH_PRIVATE_KEY:
@@ -40,10 +50,12 @@ jobs:
           ssh-keyscan -p"${{ secrets.deploy_port }}" -H "${{ secrets.deploy_host }}" "$host_ip" >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Deploy site using ssh to ${{ inputs.environment }}
-        run: |
-          port="${{ secrets.deploy_port }}"
-          user="${{ secrets.deploy_user }}"
-          host="${{ secrets.deploy_host }}"
-          path="${{ inputs.deploy_path }}"
-          ssh -o ForwardAgent=yes -p"$port" "$user@$host" -- "cd $path && git pull"
+        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && git pull"
 
+      - name: Use composer install
+        if: "${{ github.event.inputs.use_composer && github.event.inputs.php_version == '' }}"
+        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v composer >/dev/null && composer install --no-dev"
+
+      - name: Use composer install with a specific php version
+        if: "${{ github.event.inputs.use_composer && github.event.inputs.php_version != '' }}"
+        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v php${{ github.event.inputs.php_version }} >/dev/null && composer=$(command -v composer) && php${{ github.event.inputs.php_version }} $composer install --no-dev"
