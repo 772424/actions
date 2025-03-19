@@ -14,11 +14,11 @@ on:
     secrets:
       SSH_PRIVATE_KEY:
         required: true
-      deploy_port:
+      DEPLOY_PORT:
         required: true
-      deploy_user:
+      DEPLOY_USER:
         required: true
-      deploy_host:
+      DEPLOY_HOST:
         required: true
 
 jobs:
