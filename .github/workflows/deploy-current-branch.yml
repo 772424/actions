@@ -3,27 +3,21 @@ name: Deploy current branch
 on:
   workflow_call:
     inputs:
-      deploy_path:
-        required: true
-        type: string
-        description: 'path to deploy'
-
       environment:
         type: string
         required: true
         description: 'Environment to run tests against'
-
       use_composer:
         required: false
         type: boolean
         description: Set to true to use composer install after deploy
-
       php_version:
         required: false
         type: string
         description: use a specific php version, if not define, it will use the defaut php bin
-
     secrets:
+      DEPLOY_PATH:
+        required: true
       SSH_PRIVATE_KEY:
         required: true
       DEPLOY_PORT:
@@ -48,16 +42,16 @@ jobs:
       - name: Scan deploy host key
         run: |
           install -m 700 --directory ~/.ssh
-          host_ip=$(host "${{ secrets.deploy_host }}" | awk '{print $NF}')
-          ssh-keyscan -p"${{ secrets.deploy_port }}" -H "${{ secrets.deploy_host }}" "$host_ip" >> ~/.ssh/known_hosts 2>/dev/null
+          host_ip=$(host "${{ secrets.DEPLOY_HOST }}" | awk '{print $NF}')
+          ssh-keyscan -p"${{ secrets.DEPLOY_PORT }}" -H "${{ secrets.DEPLOY_HOST }}" "$host_ip" >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Deploy site using ssh to ${{ inputs.environment }}
-        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && git pull"
+        run: ssh -o ForwardAgent=yes -p"${{ secrets.DEPLOY_PORT }}" "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" -- "cd ${{ secrets.DEPLOY_PATH }} && git pull"
 
       - name: Use composer install
         if: "${{ inputs.use_composer && inputs.php_version == '' }}"
-        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v composer >/dev/null && composer install --no-dev"
+        run: ssh -o ForwardAgent=yes -p"${{ secrets.DEPLOY_PORT }}" "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" -- "cd ${{ secrets.DEPLOY_PATH }} && command -v composer >/dev/null && composer install --no-dev"
 
       - name: Use composer install with a specific php version
         if: "${{ inputs.use_composer && inputs.php_version != '' }}"
-        run: ssh -o ForwardAgent=yes -p"${{ secrets.deploy_port }}" "${{ secrets.deploy_user }}@${{ secrets.deploy_host }}" -- "cd ${{ inputs.deploy_path }} && command -v php${{ inputs.php_version }} >/dev/null && composer=\$(command -v composer) && php${{ inputs.php_version }} \$composer install --no-dev"
+        run: ssh -o ForwardAgent=yes -p"${{ secrets.DEPLOY_PORT }}" "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" -- "cd ${{ secrets.DEPLOY_PATH }} && command -v php${{ inputs.php_version }} >/dev/null && composer=\$(command -v composer) && php${{ inputs.php_version }} \$composer install --no-dev"
